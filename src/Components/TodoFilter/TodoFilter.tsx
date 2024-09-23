@@ -23,7 +23,7 @@ export const TodoFilter: React.FC<Props> = ({
       {todos.length > 0 && (
         <footer className="todoapp__footer" data-cy="Footer">
           <span className="todo-count" data-cy="TodosCounter">
-            {`${uncmpltTodosCount} items left`}
+            {`${uncmpltTodosCount} ${uncmpltTodosCount === 1 ? 'item left' : 'items left'}`}
           </span>
 
           <nav className="filter" data-cy="Filter">
