@@ -112,8 +112,8 @@ export const TodoItem: React.FC<Props> = ({
             placeholder="Empty todo will be deleted"
             value={newTitle}
             onChange={e => setNewTitle(e.target.value)}
-            onBlur={event => handleSubmit(event)}
-            onKeyUp={event => handleKeyEvent(event)}
+            onBlur={handleSubmit}
+            onKeyUp={handleKeyEvent}
           />
         </form>
       )}

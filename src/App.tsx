@@ -12,6 +12,22 @@ import { TodoFilter } from './Components/TodoFilter';
 import { Errors } from './types/Errors';
 import { Filters } from './types/Filters';
 
+const filterTodos = (todos: Todo[], filterParam: Filters): Todo[] | [] => {
+  const filteredArr = [...todos];
+
+  switch (filterParam) {
+    case Filters.completed:
+      return filteredArr.filter(todo => todo.completed);
+
+    case Filters.active:
+      return filteredArr.filter(todo => !todo.completed);
+
+    case Filters.all:
+    default:
+      return filteredArr;
+  }
+};
+
 export const App: React.FC = () => {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [errorMessage, setErrorMessage] = useState<Errors | null>(null);
@@ -27,24 +43,8 @@ export const App: React.FC = () => {
     }, 300);
   };
 
-  const filtering = (arr: Todo[], filterParam: Filters): Todo[] | [] => {
-    const filteredArr = [...arr];
-
-    switch (filterParam) {
-      case Filters.completed:
-        return filteredArr.filter(todo => todo.completed);
-
-      case Filters.active:
-        return filteredArr.filter(todo => !todo.completed);
-
-      case Filters.all:
-      default:
-        return filteredArr;
-    }
-  };
-
   const filteredTodos: Todo[] = useMemo(
-    () => filtering(todos, filter),
+    () => filterTodos(todos, filter),
     [todos, filter],
   );
 
@@ -52,9 +52,7 @@ export const App: React.FC = () => {
   useEffect(() => {
     todosClient
       .get()
-      .then(res => {
-        setTodos(() => res);
-      })
+      .then(setTodos)
       .catch(() => {
         handleErrors(Errors.load);
       });
@@ -113,24 +111,24 @@ export const App: React.FC = () => {
     [todos],
   );
 
-  const deleteTodos = (idDelete: number) => {
-    setLoadingTodoIds([...loadingTodoIds, idDelete]);
+  const deleteTodo = (id: number) => {
+    setLoadingTodoIds([...loadingTodoIds, id]);
     todosClient
-      .delete(idDelete)
+      .delete(id)
       .then(() => {
-        setTodos(cuurent => cuurent.filter(todo => todo.id !== idDelete));
+        setTodos(cuurent => cuurent.filter(todo => todo.id !== id));
       })
       .catch(() => {
         handleErrors(Errors.delete);
       })
       .finally(() => {
-        setLoadingTodoIds(prev => prev.filter(id => id !== idDelete));
+        setLoadingTodoIds(prev => prev.filter(curId => curId !== id));
         setInputResetFlag(Math.random());
       });
   };
 
   const deleteAllCompleted = () => {
-    todos.forEach(todo => (todo.completed ? deleteTodos(todo.id) : undefined));
+    todos.forEach(todo => (todo.completed ? deleteTodo(todo.id) : undefined));
   };
 
   const toggleTodo = (todoId: number) => {
@@ -179,7 +177,7 @@ export const App: React.FC = () => {
           todos={filteredTodos}
           tempTodoTitle={tempTodo}
           loadingIds={loadingTodoIds}
-          onDelete={deleteTodos}
+          onDelete={deleteTodo}
           onToggle={toggleTodo}
           onEdit={editTodo}
         />

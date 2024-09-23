@@ -7,7 +7,7 @@ type Props = {
   loadingIds: number[];
   onDelete: (id: number) => void;
   onToggle: (id: number) => void;
-  onEdit: (id: number, NewTitle: string) => {};
+  onEdit: (id: number, NewTitle: string) => void;
 };
 
 export const TodoList: React.FC<Props> = ({
